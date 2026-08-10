@@ -1,4 +1,5 @@
 import argparse
+import tarfile as tar
 from pathlib import Path
 
 import zstandard as zstd
@@ -10,10 +11,16 @@ args = parser.parse_args()
 
 path = Path(args.file)
 
+print(path)
+
 out_tar_path = path.with_suffix("")
+print(out_tar_path)
 
 
 with open(path, "rb") as f:
     decompressor = zstd.ZstdDecompressor()
     with open(out_tar_path, "wb") as out:
         decompressor.copy_stream(f, out)
+
+with tar.open(out_tar_path, "r") as t:
+    t.extractall(path="output_folder")
