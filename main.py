@@ -13,6 +13,9 @@ def main():
     parser.add_argument("file")
     args = parser.parse_args()
 
+    if not (args.t or args.z or args.zt):
+        parser.error("Please specify at least one flag: -t, -z, or --zt")
+
     path = Path(args.file)
     out_tar_path = path.with_suffix("")
 
