@@ -7,8 +7,8 @@ import zstandard as zstd
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--t", action="store_true")
-    parser.add_argument("--z", action="store_true")
+    parser.add_argument("-t", action="store_true")
+    parser.add_argument("-z", action="store_true")
     parser.add_argument("--zt", action="store_true")
     parser.add_argument("file")
     args = parser.parse_args()
