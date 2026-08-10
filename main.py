@@ -1,4 +1,5 @@
 import argparse
+import sys
 import tarfile as tar
 from pathlib import Path
 
@@ -17,6 +18,11 @@ def main():
         parser.error("Please specify at least one flag: -t, -z, or --zt")
 
     path = Path(args.file)
+
+    if not path.exists():
+        print(f"File not found: {path}", file=sys.stderr)
+        sys.exit(1)
+
     out_tar_path = path.with_suffix("")
 
     if args.z or args.zt:
