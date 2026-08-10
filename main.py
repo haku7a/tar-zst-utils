@@ -25,15 +25,19 @@ def main():
 
     out_tar_path = path.with_suffix("")
 
-    if args.z or args.zt:
-        with open(path, "rb") as f:
-            decompressor = zstd.ZstdDecompressor()
-            with open(out_tar_path, "wb") as out:
-                decompressor.copy_stream(f, out)
+    try:
+        if args.z or args.zt:
+            with open(path, "rb") as f:
+                decompressor = zstd.ZstdDecompressor()
+                with open(out_tar_path, "wb") as out:
+                    decompressor.copy_stream(f, out)
 
-    if args.t or args.zt:
-        with tar.open(out_tar_path, "r") as t:
-            t.extractall(path="output_folder")
+        if args.t or args.zt:
+            with tar.open(out_tar_path, "r") as t:
+                t.extractall(path="output_folder")
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
