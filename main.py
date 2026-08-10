@@ -11,13 +11,8 @@ parser.add_argument("--zt", action="store_true")
 parser.add_argument("file")
 args = parser.parse_args()
 
-
 path = Path(args.file)
-
-print(path)
-
 out_tar_path = path.with_suffix("")
-print(out_tar_path)
 
 if args.z or args.zt:
     with open(path, "rb") as f:
