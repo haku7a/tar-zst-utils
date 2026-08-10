@@ -5,6 +5,8 @@ from pathlib import Path
 import zstandard as zstd
 
 parser = argparse.ArgumentParser()
+parser.add_argument("--t", action="store_true")
+parser.add_argument("--z", action="store_true")
 parser.add_argument("file")
 args = parser.parse_args()
 
@@ -16,11 +18,12 @@ print(path)
 out_tar_path = path.with_suffix("")
 print(out_tar_path)
 
+if args.z:
+    with open(path, "rb") as f:
+        decompressor = zstd.ZstdDecompressor()
+        with open(out_tar_path, "wb") as out:
+            decompressor.copy_stream(f, out)
 
-with open(path, "rb") as f:
-    decompressor = zstd.ZstdDecompressor()
-    with open(out_tar_path, "wb") as out:
-        decompressor.copy_stream(f, out)
-
-with tar.open(out_tar_path, "r") as t:
-    t.extractall(path="output_folder")
+if args.t:
+    with tar.open(out_tar_path, "r") as t:
+        t.extractall(path="output_folder")
