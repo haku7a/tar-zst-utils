@@ -1,7 +1,11 @@
 import argparse
+from pathlib import Path
 
 parser = argparse.ArgumentParser()
 parser.add_argument("file")
 args = parser.parse_args()
 
-print(args.file)
+
+path = Path(args.file)
+
+print(path.resolve())
