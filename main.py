@@ -35,6 +35,9 @@ def build_parser() -> argparse.ArgumentParser:
         "decompress-extract", aliases=["de"], help="Decompress and extract in one step"
     )
     p_decex.add_argument("file")
+    p_decex.add_argument(
+        "-o", "--output", help="Output directory path (default: output_folder)"
+    )
     p_decex.set_defaults(func=decompress_extract)
 
     return parser
@@ -62,7 +65,7 @@ def extract(args):
 
 def decompress_extract(args):
     input_path = Path(args.file)
-    output_path = Path("output_folder")
+    output_path = Path(args.output) if args.output else Path("output_folder")
     output_path.mkdir(parents=True, exist_ok=True)
 
     dctx = zstd.ZstdDecompressor()
