@@ -43,7 +43,7 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def decompress(args):
+def decompress(args: argparse.Namespace) -> None:
     input_path = Path(args.file)
     output_path = Path(args.output) if args.output else input_path.with_suffix("")
 
@@ -54,7 +54,7 @@ def decompress(args):
             dctx.copy_stream(ifh, ofh)
 
 
-def extract(args):
+def extract(args: argparse.Namespace) -> None:
     input_path = Path(args.file)
     output_path = Path(args.output) if args.output else Path("output_folder")
     output_path.mkdir(parents=True, exist_ok=True)
@@ -63,7 +63,7 @@ def extract(args):
         tar.extractall(path=output_path, filter="data")
 
 
-def decompress_extract(args):
+def decompress_extract(args: argparse.Namespace) -> None:
     input_path = Path(args.file)
     output_path = Path(args.output) if args.output else Path("output_folder")
     output_path.mkdir(parents=True, exist_ok=True)
@@ -76,7 +76,7 @@ def decompress_extract(args):
             tar.extractall(path=output_path, filter="data")
 
 
-def main(argv: List[str] | None = None):
+def main(argv: List[str] | None = None) -> None:
 
     parser = build_parser()
     args = parser.parse_args(argv)
