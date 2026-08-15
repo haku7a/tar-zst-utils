@@ -25,6 +25,9 @@ def build_parser() -> argparse.ArgumentParser:
         "extract", aliases=["e"], help="Extract a .tar archive"
     )
     p_extract.add_argument("file")
+    p_extract.add_argument(
+        "-o", "--output", help="Output directory path (default: output_folder)"
+    )
     p_extract.set_defaults(func=extract)
 
     # decompress + extract
@@ -50,7 +53,7 @@ def decompress(args):
 
 def extract(args):
     input_path = Path(args.file)
-    output_path = Path("output_folder")
+    output_path = Path(args.output) if args.output else Path("output_folder")
     output_path.mkdir(parents=True, exist_ok=True)
 
     with tarfile.open(input_path, "r") as tar:
