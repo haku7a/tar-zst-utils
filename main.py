@@ -48,6 +48,13 @@ def build_parser() -> argparse.ArgumentParser:
     p_comp.add_argument(
         "-o", "--output", help="Output file path (default: input filename + .zst)"
     )
+    p_comp.add_argument(
+        "-l",
+        "--level",
+        type=int,
+        default=22,
+        help="Compression level, 1-22 (default: 22)",
+    )
     p_comp.set_defaults(func=compress)
 
     return parser
@@ -94,7 +101,7 @@ def compress(args: argparse.Namespace) -> None:
         else input_path.with_suffix(input_path.suffix + ".zst")
     )
 
-    cctx = zstd.ZstdCompressor(level=22)
+    cctx = zstd.ZstdCompressor(level=args.level)
 
     with open(input_path, "rb") as ifh:
         with open(output_path, "wb") as ofh:
