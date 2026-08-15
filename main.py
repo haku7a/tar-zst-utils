@@ -29,6 +29,7 @@ def build_parser() -> argparse.ArgumentParser:
         "decompress-extract", aliases=["de"], help="Decompress and extract in one step"
     )
     p_decex.add_argument("file")
+    p_decex.set_defaults(func=decompress_extract)
 
     return parser
 
@@ -51,6 +52,19 @@ def extract(args):
 
     with tarfile.open(input_path, "r") as tar:
         tar.extractall(path=output_path, filter="data")
+
+
+def decompress_extract(args):
+    input_path = Path(args.file)
+    output_path = Path("output_folder")
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    dctx = zstd.ZstdDecompressor()
+
+    with open(input_path, "rb") as ifh:
+        reader = dctx.stream_reader(ifh)
+        with tarfile.open(fileobj=reader, mode="r|") as tar:
+            tar.extractall(path=output_path, filter="data")
 
 
 def main(argv: List[str] | None = None):
