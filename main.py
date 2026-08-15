@@ -34,7 +34,7 @@ def main():
 
         if args.t or args.zt:
             with tar.open(out_tar_path, "r") as t:
-                t.extractall(path="output_folder")
+                t.extractall(path="output_folder", filter="data")
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
