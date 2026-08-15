@@ -15,6 +15,9 @@ def build_parser() -> argparse.ArgumentParser:
         "decompress", aliases=["d"], help="Decompress .zst to .tar"
     )
     p_decomp.add_argument("file")
+    p_decomp.add_argument(
+        "-o", "--output", help="Output file path (default: input filename without .zst)"
+    )
     p_decomp.set_defaults(func=decompress)
 
     # extract
@@ -36,7 +39,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def decompress(args):
     input_path = Path(args.file)
-    output_path = input_path.with_suffix("")
+    output_path = Path(args.output) if args.output else input_path.with_suffix("")
 
     dctx = zstd.ZstdDecompressor()
 
