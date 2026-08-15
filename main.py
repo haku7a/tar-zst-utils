@@ -40,6 +40,16 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_decex.set_defaults(func=decompress_extract)
 
+    # compress
+    p_comp = subparsers.add_parser(
+        "compress", aliases=["c"], help="Compress a file to .zst"
+    )
+    p_comp.add_argument("file")
+    p_comp.add_argument(
+        "-o", "--output", help="Output file path (default: input filename + .zst)"
+    )
+    p_comp.set_defaults(func=compress)
+
     return parser
 
 
@@ -74,6 +84,21 @@ def decompress_extract(args: argparse.Namespace) -> None:
         reader = dctx.stream_reader(ifh)
         with tarfile.open(fileobj=reader, mode="r|") as tar:
             tar.extractall(path=output_path, filter="data")
+
+
+def compress(args: argparse.Namespace) -> None:
+    input_path = Path(args.file)
+    output_path = (
+        Path(args.output)
+        if args.output
+        else input_path.with_suffix(input_path.suffix + ".zst")
+    )
+
+    cctx = zstd.ZstdCompressor(level=22)
+
+    with open(input_path, "rb") as ifh:
+        with open(output_path, "wb") as ofh:
+            cctx.copy_stream(ifh, ofh)
 
 
 def main(argv: List[str] | None = None) -> None:
