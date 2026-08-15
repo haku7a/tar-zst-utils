@@ -1,4 +1,5 @@
 import argparse
+import tarfile
 from pathlib import Path
 from typing import List
 
@@ -21,6 +22,7 @@ def build_parser() -> argparse.ArgumentParser:
         "extract", aliases=["e"], help="Extract a .tar archive"
     )
     p_extract.add_argument("file")
+    p_extract.set_defaults(func=extract)
 
     # decompress + extract
     p_decex = subparsers.add_parser(
@@ -40,6 +42,15 @@ def decompress(args):
     with open(input_path, "rb") as ifh:
         with open(output_path, "wb") as ofh:
             dctx.copy_stream(ifh, ofh)
+
+
+def extract(args):
+    input_path = Path(args.file)
+    output_path = Path("output_folder")
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    with tarfile.open(input_path, "r") as tar:
+        tar.extractall(path=output_path, filter="data")
 
 
 def main(argv: List[str] | None = None):
