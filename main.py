@@ -64,6 +64,16 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_comp.set_defaults(func=compress)
 
+    # archive
+    p_arch = subparsers.add_parser(
+        "archive", aliases=["a"], help="Create a .tar archive"
+    )
+    p_arch.add_argument("file")
+    p_arch.add_argument(
+        "-o", "--output", help="Output file path (default: source name + .tar)"
+    )
+    p_arch.set_defaults(func=archive)
+
     return parser
 
 
@@ -113,6 +123,18 @@ def compress(args: argparse.Namespace) -> None:
     with open(input_path, "rb") as ifh:
         with open(output_path, "wb") as ofh:
             cctx.copy_stream(ifh, ofh)
+
+
+def archive(args: argparse.Namespace) -> None:
+    input_path = Path(args.file)
+    output_path = (
+        Path(args.output)
+        if args.output
+        else input_path.with_suffix(input_path.suffix + ".tar")
+    )
+
+    with tarfile.open(output_path, "w") as tar:
+        tar.add(input_path, arcname=input_path.name)
 
 
 def main(argv: List[str] | None = None) -> None:
