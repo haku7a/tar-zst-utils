@@ -55,6 +55,13 @@ def build_parser() -> argparse.ArgumentParser:
         default=22,
         help="Compression level, 1-22 (default: 22)",
     )
+    p_comp.add_argument(
+        "-t",
+        "--threads",
+        type=int,
+        default=0,
+        help="Number of threads (0 = all CPUs, default: 0)",
+    )
     p_comp.set_defaults(func=compress)
 
     return parser
@@ -101,7 +108,7 @@ def compress(args: argparse.Namespace) -> None:
         else input_path.with_suffix(input_path.suffix + ".zst")
     )
 
-    cctx = zstd.ZstdCompressor(level=args.level)
+    cctx = zstd.ZstdCompressor(level=args.level, threads=args.threads)
 
     with open(input_path, "rb") as ifh:
         with open(output_path, "wb") as ofh:
