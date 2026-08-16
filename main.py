@@ -74,6 +74,32 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_arch.set_defaults(func=archive)
 
+    # archive + compress
+    p_archcomp = subparsers.add_parser(
+        "archive-compress",
+        aliases=["ac"],
+        help="Archive and compress to .tar.zst in one step",
+    )
+    p_archcomp.add_argument("file")
+    p_archcomp.add_argument(
+        "-o", "--output", help="Output file path (default: source name + .tar.zst)"
+    )
+    p_archcomp.add_argument(
+        "-l",
+        "--level",
+        type=int,
+        default=22,
+        help="Compression level, 1-22 (default: 22)",
+    )
+    p_archcomp.add_argument(
+        "-t",
+        "--threads",
+        type=int,
+        default=0,
+        help="Number of threads (0 = all CPUs, default: 0)",
+    )
+    p_archcomp.set_defaults(func=archive_compress)
+
     return parser
 
 
@@ -135,6 +161,22 @@ def archive(args: argparse.Namespace) -> None:
 
     with tarfile.open(output_path, "w") as tar:
         tar.add(input_path, arcname=input_path.name)
+
+
+def archive_compress(args: argparse.Namespace) -> None:
+    input_path = Path(args.file)
+    output_path = (
+        Path(args.output)
+        if args.output
+        else input_path.with_suffix(input_path.suffix + ".tar.zst")
+    )
+
+    cctx = zstd.ZstdCompressor(level=args.level, threads=args.threads)
+
+    with open(output_path, "wb") as ofh:
+        with cctx.stream_writer(ofh) as compressor:
+            with tarfile.open(fileobj=compressor, mode="w|") as tar:
+                tar.add(input_path, arcname=input_path.name)
 
 
 def main(argv: List[str] | None = None) -> None:
