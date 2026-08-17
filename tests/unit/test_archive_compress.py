@@ -1,6 +1,8 @@
 import argparse
 from pathlib import Path
 
+import pytest
+
 from commands.archive_compress import archive_compress
 
 
@@ -29,3 +31,11 @@ def test_creates_archive_with_custom_output(text_file: Path) -> None:
     archive_compress(args)
 
     assert output_path.exists()
+
+
+def test_raises_error_if_input_file_missing(tmp_path) -> None:
+    missing_file = tmp_path / "missing.txt"
+    args = _make_args(missing_file)
+
+    with pytest.raises(FileNotFoundError):
+        archive_compress(args)
