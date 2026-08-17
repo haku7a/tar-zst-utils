@@ -1,7 +1,9 @@
 import argparse
+import tarfile
 from pathlib import Path
 
 import pytest
+import zstandard as zstd
 
 from commands.archive_compress import archive_compress
 
@@ -15,13 +17,21 @@ def _make_args(file, output=None, level=3, threads=0):
     )
 
 
-def test_creates_non_empty_tar_zst_archive(text_file):
+def test_creates_valid_tar_zst_archive(text_file: Path) -> None:
     args = _make_args(text_file)
     archive_compress(args)
     expected = text_file.with_name(text_file.name + ".tar.zst")
 
     assert expected.exists()
     assert expected.stat().st_size > 0
+
+    dctx = zstd.ZstdDecompressor()
+    with open(expected, "rb") as fh:
+        with dctx.stream_reader(fh) as reader:
+            with tarfile.open(fileobj=reader, mode="r|") as tar:
+                names = [m.name for m in tar]
+
+    assert names == [text_file.name]
 
 
 def test_creates_archive_with_custom_output(text_file: Path) -> None:
@@ -33,7 +43,7 @@ def test_creates_archive_with_custom_output(text_file: Path) -> None:
     assert output_path.exists()
 
 
-def test_raises_error_if_input_file_missing(tmp_path) -> None:
+def test_raises_error_if_input_file_missing(tmp_path: Path) -> None:
     missing_file = tmp_path / "missing.txt"
     args = _make_args(missing_file)
 
