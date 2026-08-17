@@ -1,6 +1,8 @@
 import argparse
 from pathlib import Path
 
+import zstandard as zstd
+
 from commands.compress import compress
 
 
@@ -14,6 +16,8 @@ def _make_args(file: Path, output=None, level=3, threads=0) -> argparse.Namespac
 
 
 def test_tar_archive_has_valid_content(tar_file: Path) -> None:
+    original_content = tar_file.read_bytes()
+
     args = _make_args(tar_file)
     compress(args)
 
@@ -21,3 +25,11 @@ def test_tar_archive_has_valid_content(tar_file: Path) -> None:
 
     assert expected.exists()
     assert expected.stat().st_size > 0
+
+    dctx = zstd.ZstdDecompressor()
+
+    with open(expected, "rb") as f:
+        with dctx.stream_reader(f) as reader:
+            decompressed = reader.read()
+
+    assert original_content == decompressed
