@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 
 from commands.archive_compress import archive_compress
 
@@ -19,3 +20,12 @@ def test_creates_non_empty_tar_zst_archive(text_file):
 
     assert expected.exists()
     assert expected.stat().st_size > 0
+
+
+def test_creates_archive_with_custom_output(text_file: Path) -> None:
+    output_path = text_file.parent / "test_name.txt.tar.zst"
+
+    args = _make_args(text_file, output=str(output_path))
+    archive_compress(args)
+
+    assert output_path.exists()
